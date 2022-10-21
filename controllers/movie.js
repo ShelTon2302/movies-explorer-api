@@ -5,18 +5,30 @@ const NotFoundError = require('../errors/not-found-error');
 
 module.exports.moviesCurrentUser = (req, res, next) => {
   Movie.find({ owner: req.user._id })
-  .then((movies) => res.send({ movies }))
-  .catch(next);
+    .then((movies) => res.send({ movies }))
+    .catch(next);
 };
 
 module.exports.saveMovie = (req, res, next) => {
   const owner = req.user._id;
   const {
-    country, director, duration, year, description, image, trailerLink, thumbnail, movieId, nameRU, nameEN
+    country, director, duration, year, description, image,
+    trailerLink, thumbnail, movieId, nameRU, nameEN,
   } = req.body; // получим из объекта запроса данные фильма
 
   Movie.create({
-    country, director, duration, year, description, image, trailerLink, thumbnail, owner, movieId, nameRU, nameEN
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    owner,
+    movieId,
+    nameRU,
+    nameEN,
   }) // создадим документ на основе пришедших данных
     // .populate(['owner'])
     .then((movie) => {

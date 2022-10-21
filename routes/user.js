@@ -3,7 +3,7 @@ const userRouter = require('express').Router(); // создали роутер
 const {
   currentUser, updateUser,
 } = require('../controllers/user');
-//const { urlRule } = require('../const/const');
+// const { urlRule } = require('../const/const');
 
 userRouter.get('/users/me', currentUser);
 
