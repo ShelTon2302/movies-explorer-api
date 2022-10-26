@@ -15,7 +15,6 @@ const movieSchema = new mongoose.Schema({
   duration: {
     type: Number,
     required: [true, 'Необходимо заполнить длительность фильма'],
-    minlength: 2,
   },
   year: {
     type: Number,
@@ -56,7 +55,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   movieId: {
-    type: String,
+    type: Number,
     required: true,
   },
   nameRU: {

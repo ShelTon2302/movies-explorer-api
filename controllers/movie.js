@@ -2,6 +2,7 @@ const Movie = require('../models/movie');
 const RequestError = require('../errors/request-error');
 const AccessError = require('../errors/access-error');
 const NotFoundError = require('../errors/not-found-error');
+const { msgReqErr, msgAccessError, msgNoMovie } = require('../const/const');
 
 module.exports.moviesCurrentUser = (req, res, next) => {
   Movie.find({ owner: req.user._id })
@@ -37,7 +38,7 @@ module.exports.saveMovie = (req, res, next) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new RequestError('Переданы некорректные данные'));
+        next(new RequestError(msgReqErr));
         return;
       }
       next(err);
@@ -51,19 +52,21 @@ module.exports.deleteMovie = (req, res, next) => {
       if (movie.owner.toString() === req.user._id) {
         const deletedMovie = movie;
         movie.remove()
+          .then(() => {
+            res.send(deletedMovie);
+          })
           .catch(next);
-        res.send(deletedMovie);
       } else {
-        next(new AccessError('Нарушение прав доступа'));
+        next(new AccessError(msgAccessError));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new RequestError('Переданы некорректные данные'));
+        next(new RequestError(msgReqErr));
         return;
       }
       if (err.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Запрашиваемая карточка не найдена'));
+        next(new NotFoundError(msgNoMovie));
         return;
       }
       next(err);

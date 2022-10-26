@@ -1,10 +1,14 @@
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const jwtSecretDev = require('../const/conf');
 const NotFoundError = require('../errors/not-found-error');
 const RequestError = require('../errors/request-error');
 const AuthError = require('../errors/auth-error');
 const NotUniqueEmailError = require('../errors/not-unique-email-error');
+const {
+  msgNotUniqueUser, msgNoUser, msgReqErr, msgAuthErr, msgLogout,
+} = require('../const/const');
 
 module.exports.createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
@@ -17,11 +21,11 @@ module.exports.createUser = (req, res, next) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.code === 11000) {
-        next(new NotUniqueEmailError('Пользователь с таким email уже существует'));
+        next(new NotUniqueEmailError(msgNotUniqueUser));
         return;
       }
       if (err.name === 'ValidationError') {
-        next(new RequestError('Переданы некорректные данные'));
+        next(new RequestError(msgReqErr));
         return;
       }
       next(err);
@@ -36,7 +40,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : '59c55acd63cac9349e3b2c538e86de0f',
+        NODE_ENV === 'production' ? JWT_SECRET : jwtSecretDev,
         { expiresIn: '7d' },
       );
       res.cookie('jwt', token, {
@@ -46,14 +50,14 @@ module.exports.login = (req, res, next) => {
         .send(user.toObject());
     })
     .catch(() => {
-      throw new AuthError('Необходима авторизация');
+      throw new AuthError(msgAuthErr);
     })
     .catch(next);
 };
 
 module.exports.logout = (req, res, next) => {
   User.findById(req.user._id)
-    .then(() => res.clearCookie('jwt').send({ messge: 'Выход пользователя' }))
+    .then(() => res.clearCookie('jwt').send({ messge: msgLogout }))
     .catch(next);
 };
 
@@ -61,10 +65,6 @@ module.exports.currentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => res.send(user.toObject()))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new RequestError('Переданы некорректные данные'));
-        return;
-      }
       next(err);
     });
 };
@@ -82,7 +82,7 @@ module.exports.updateUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Запрашиваемый пользователь не найден'));
+        next(new NotFoundError(msgNoUser));
         return;
       }
       res.send(user.toObject());
@@ -90,11 +90,15 @@ module.exports.updateUser = (req, res, next) => {
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new RequestError('Переданы некорректные данные'));
+        next(new RequestError(msgReqErr));
         return;
       }
       if (err.name === 'CastError') {
-        next(new NotFoundError('Запрашиваемый пользователь не найден'));
+        next(new NotFoundError(msgNoUser));
+        return;
+      }
+      if (err.code === 11000) {
+        next(new NotUniqueEmailError(msgNotUniqueUser));
         return;
       }
       next(err);
