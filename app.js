@@ -2,7 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const { errors } = require('celebrate');
 require('dotenv').config();
 const cors = require('./middlewares/cors');
@@ -33,7 +33,7 @@ app.use(requestLogger); // подключаем логгер запросов
 
 app.use(limiter); // подключаем ограничитель количества запросов с одного адресв
 
-app.use(helmet()); // добавление заголовков безопасности
+// app.use(helmet()); // добавление заголовков безопасности
 
 app.use(cors);
 
