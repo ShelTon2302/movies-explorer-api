@@ -11,13 +11,26 @@ const {
 } = require('../const/const');
 
 module.exports.createUser = (req, res, next) => {
+  const { NODE_ENV, JWT_SECRET } = process.env;
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       email: req.body.email,
       password: hash,
       name: req.body.name,
     })) // создадим документ на основе пришедших данных
-    .then((user) => res.status(201).send(user.toObject()))
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : jwtSecretDev,
+        { expiresIn: '7d' },
+      );
+      res.status(201)
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .send(user.toObject());
+    })
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.code === 11000) {
