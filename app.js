@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 // const helmet = require('helmet');
 const { errors } = require('celebrate');
 require('dotenv').config();
-const cors = require('./middlewares/cors');
+// const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/error');
 const { limiter } = require('./middlewares/limiter');
@@ -35,7 +35,7 @@ app.use(limiter); // подключаем ограничитель количе�
 
 // app.use(helmet()); // добавление заголовков безопасности
 
-app.use(cors);
+// app.use(cors);
 
 app.use(require('./routes/index'));
 
