@@ -1,7 +1,6 @@
 module.exports.allowedCors = [
   'http://project-movies.nomoredomains.icu',
   'https://project-movies.nomoredomains.icu',
-  'http://localhost:3000',
 ];
 
 module.exports.msgNeedAuth = 'Необходима авторизация';
