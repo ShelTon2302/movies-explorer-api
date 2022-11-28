@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
   const requestHeaders = req.headers['access-control-request-headers']; // сохраняем список заголовков исходного запроса
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE'; // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
   // проверяем, что источник запроса есть среди разрешённых
+  console.log(origin, req);
   if (allowedCors.includes(origin)) {
     // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
     res.header('Access-Control-Allow-Origin', origin);
@@ -19,6 +20,7 @@ module.exports = (req, res, next) => {
     // разрешаем кросс-доменные запросы с этими заголовками
     res.header('Access-Control-Allow-Headers', requestHeaders);
     // завершаем обработку запроса и возвращаем результат клиенту
+    console.log(res);
     return res.end();
   }
 
