@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const jwtSecretDev = require('../const/conf');
+const { jwtSecretDev } = require('../const/conf');
 const NotFoundError = require('../errors/not-found-error');
 const RequestError = require('../errors/request-error');
 const AuthError = require('../errors/auth-error');
@@ -14,9 +14,9 @@ module.exports.createUser = (req, res, next) => {
   const { NODE_ENV, JWT_SECRET } = process.env;
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
+      name: req.body.name,
       email: req.body.email,
       password: hash,
-      name: req.body.name,
     })) // создадим документ на основе пришедших данных
     .then((user) => {
       const token = jwt.sign(
@@ -24,11 +24,11 @@ module.exports.createUser = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : jwtSecretDev,
         { expiresIn: '7d' },
       );
-      res.status(201)
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        })
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      })
+        .status(201)
         .send(user.toObject());
     })
     // данные не записались, вернём ошибку

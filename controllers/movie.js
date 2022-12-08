@@ -33,7 +33,7 @@ module.exports.saveMovie = (req, res, next) => {
   }) // создадим документ на основе пришедших данных
     // .populate(['owner'])
     .then((movie) => {
-      res.send({ movie });
+      res.send(movie.toObject());
     })
     // данные не записались, вернём ошибку
     .catch((err) => {
